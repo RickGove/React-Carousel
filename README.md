@@ -32,7 +32,25 @@
 # Advanced Use
  The carousel has many features which can be customized using props
  
- Prop   |  Type     |  Function | Default
- -------------------------------
- flyTo|Boolean|Enable or diable clicking on dots to fly to a slide | true
- 
+| Prop        | Description | Type | Default |
+| ----------- | ----------- | -----|---------|
+| arrowColor  | Arrow Color | string| 'black'|
+| arrowOffest | Left/Right offset of arrows|string (css value)|'2.2rem'|
+| debug|Show state info|boolean|false|
+| dotsOffsetFromBottom| Distance from bottom of dots|integer (css %)|5|
+|flyTo| Enable clicking of dots to fly to given slide|boolean|true|
+|freeWheel| Enable snapping on touchpad two finger swipe |boolean|false|
+|openingSlide|Which slide to show on load|integer|0|
+
+Example:
+
+```jsx
+<Carousel
+ arrowColor="blue"
+ flyTo={false}
+ openingSlide={2}
+ dotsOffsetFromBottom={44}
+>
+ ...
+</Carousel>
+```
