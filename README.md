@@ -1,12 +1,18 @@
-import Carousel from './src/Carousel'
-
-# React Carousel
- A simple react carousel as a test task for ScandiWeb
+# Rick Gove's React Carousel
+ A simple react carousel built as a test task for ScandiWeb
+ 
+# Navigation
+ You can naviagte from slide to slide by clicking the arrows,
+ Swiping on a mobile screen
+ Swiping with two fingers on a touchpad (like a MacBook pro)
+ Fly to a certain slide by clicking its corresponding dot
 
 # Use
  Download or clone the repo
  
  Copy the `Carousel.js` file to your own project
+ 
+ * Run `npm install` if you do not have `Styled-Components` as a dependancy yet
  
  Import the carousel
  `import Carousel from './Carousel`
@@ -19,4 +25,9 @@ import Carousel from './src/Carousel'
    <img src="image.jpeg">
  </Carousel>
  ```
- each one of the children will be given it's own frame in the carousel.
+ Each one of the children will be given it's own frame in the carousel. 
+ Children can be any valid React component
+ 
+# Advanced Use
+ The carousel has many features which can be customized using props
+ 
