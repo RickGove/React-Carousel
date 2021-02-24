@@ -17,8 +17,6 @@ export default function Carousel(props) {
 		frameWidth,
 		freeWheel,
 		openingSlide,
-		useKeyboard,
-		useSwipe,
 	} = props;
 
 	////////////////////////////////
@@ -32,8 +30,6 @@ export default function Carousel(props) {
 	if (!frameHeight) frameHeight = 270;
 	if (!frameWidth) frameWidth = 350;
 	if (!freeWheel) freeWheel = false;
-	if (!useKeyboard) useKeyboard = false;
-	if (!useSwipe) useSwipe = true;
 	//
 	///////////////////////////
 
@@ -89,10 +85,8 @@ export default function Carousel(props) {
 	}, []);
 
 	const setFrameSizeAndOuterBoundary = () => {
-		if (borderRef.current) {
-			setDeterminedFrameSize(borderRef.current.clientWidth);
-			setOuterBoundary((children.length - 1) * borderRef.current.clientWidth);
-		}
+		setDeterminedFrameSize(borderRef?.current.clientWidth);
+		setOuterBoundary((children.length - 1) * borderRef?.current.clientWidth);
 	};
 
 	const handleTouchStart = e => {
