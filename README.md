@@ -2,10 +2,11 @@
  A simple react carousel built as a test task for ScandiWeb
  
 # Navigation
- You can naviagte from slide to slide by clicking the arrows,
- Swiping on a mobile screen
- Swiping with two fingers on a touchpad (like a MacBook pro)
- Fly to a certain slide by clicking its corresponding dot
+ You can naviagte from slide to slide by 
+ - clicking the arrows,
+ - swiping on a mobile screen,
+ - swiping with two fingers on a touchpad (like a MacBook pro)
+ - fly to a certain slide by clicking its corresponding dot
 
 # Use
  Download or clone the repo
