@@ -32,3 +32,7 @@
 # Advanced Use
  The carousel has many features which can be customized using props
  
+ Prop   |  Type     |  Function | Default
+ -------------------------------
+ flyTo|Boolean|Enable or diable clicking on dots to fly to a slide | true
+ 
