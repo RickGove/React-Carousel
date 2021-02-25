@@ -2,21 +2,29 @@
  A simple react carousel built as a test task for ScandiWeb
  
 # Navigation
- You can naviagte from slide to slide by 
- - clicking the arrows,
- - swiping on a mobile screen,
- - swiping with two fingers on a touchpad (like a MacBook pro)
+ You can navigate from slide to slide by 
+ - clicking the arrows
+ - swiping on a mobile screen
+ - swiping with two fingers on a touchpad (like a MacBook pro mouse)
  - fly to a certain slide by clicking its corresponding dot
 
+# Demo
+<a href="https://rickgove.github.io/#/carousel">demo page</a>
+
+*or*
+
+Download, clone or fork the repo
+
+In terminal run
+`npm install && npm start`
+
 # Use
- Download or clone the repo
- 
  Copy the `Carousel.js` file to your own project
  
- * Run `npm install` if you do not have `Styled-Components` as a dependancy yet
+ **Run `npm install` if you do not have `Styled-Components` as a dependancy yet**
  
  Import the carousel
- `import Carousel from './Carousel`
+ `import Carousel from './Carousel'`
  
  Render the carousel with children:
  
@@ -32,7 +40,29 @@
 # Advanced Use
  The carousel has many features which can be customized using props
  
- Prop   |  Type     |  Function | Default
- -------------------------------
- flyTo|Boolean|Enable or diable clicking on dots to fly to a slide | true
- 
+| Prop        | Description | Type | Default |
+| ----------- | ----------- | -----|---------|
+| arrowColor  | Arrow Color | string| 'black'|
+| arrowOffest | Left/Right offset of arrows|string (css value)|'2.2rem'|
+| debug|Show state info|boolean|false|
+| dotsOffsetFromBottom| Distance from bottom of dots|integer (css %)|5|
+|flyTo| Enable clicking of dots to fly to given slide|boolean|true|
+|freeWheel| Enable snapping on touchpad two finger swipe |boolean|false|
+|openingSlide|Which slide to show on load|integer|0|
+|showPosition|Show which slide is currently shown|boolean|true|
+|showPositionFadeOut|Time in which position is faded out|int(ms)|4000|;
+
+Example:
+
+```jsx
+<Carousel
+ arrowColor="blue"
+ flyTo={false}
+ openingSlide={2}
+ dotsOffsetFromBottom={44}
+>
+ ...
+</Carousel>
+```
+
+# Thank you for taking time to have a look
