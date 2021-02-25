@@ -17,6 +17,8 @@ export default function Carousel(props) {
 		frameWidth,
 		freeWheel,
 		openingSlide,
+		showPosition,
+		showPositionFadeOut,
 	} = props;
 
 	////////////////////////////////
@@ -30,6 +32,8 @@ export default function Carousel(props) {
 	if (!frameHeight) frameHeight = 270;
 	if (!frameWidth) frameWidth = 350;
 	if (!freeWheel) freeWheel = false;
+	if (!showPosition) showPosition = true;
+	if (!showPositionFadeOut) showPositionFadeOut = 4000;
 	//
 	///////////////////////////
 
@@ -41,7 +45,8 @@ export default function Carousel(props) {
 	const [locked, setLocked] = useState(false);
 	const [outerBoundary, setOuterBoundary] = useState(0);
 	const [right, setRight] = useState(0);
-	const [xStart, setXStart] = useState(0);
+	const [showPositionState, setShowPosition] = useState(showPosition);
+	const [X, setX] = useState(0);
 
 	// refs
 	const borderRef = useRef();
@@ -51,6 +56,7 @@ export default function Carousel(props) {
 	useEffect(() => {
 		// initFrameSizeAndOuterBoundary
 		setFrameSizeAndOuterBoundary();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -74,6 +80,7 @@ export default function Carousel(props) {
 	useEffect(() => {
 		// listenForRightChangeAndUpdateActive
 		setActive(Math.round(right / determinedFrameSize));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [right]);
 
 	useEffect(() => {
@@ -82,36 +89,59 @@ export default function Carousel(props) {
 		else {
 			setRight(openingSlide * determinedFrameSize);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	useEffect(() => {
+		if (showPositionFadeOut === -1) return;
+
+		window.setTimeout(() => {
+			setShowPosition(false);
+		}, showPositionFadeOut);
+	});
+
 	const setFrameSizeAndOuterBoundary = () => {
-		setDeterminedFrameSize(borderRef?.current.clientWidth);
-		setOuterBoundary((children.length - 1) * borderRef?.current.clientWidth);
+		if (!borderRef) return;
+
+		setDeterminedFrameSize(borderRef.current.clientWidth);
+
+		setOuterBoundary((children.length - 1) * borderRef.current.clientWidth);
 	};
 
 	const handleTouchStart = e => {
-		console.log('touch start');
-		setXStart(e.touches[0].clientX);
+		document.body.style.overflow = 'hidden';
+
+		setX(e.touches[0].clientX);
+
+		setMovingBy(0);
 	};
+
+	const [movingBy, setMovingBy] = useState(0);
 
 	const handleTouchMove = e => {
 		const current = e.touches[0].clientX;
-		const dif = (xStart - current) / 10;
 
-		setDif(dif);
+		let difVal = X - current;
 
-		if ((dif > 0 && right < outerBoundary) || (dif < 0 && right > 0))
-			setRight(right + dif);
+		if (right + difVal <= 0) setRight(0);
+		else if (right + difVal >= outerBoundary) setRight(outerBoundary);
+		else setRight(right + difVal);
+
+		setX(e.touches[0].clientX);
 	};
 
 	const handleTouchEnd = () => {
+		window.setTimeout(() => {
+			document.body.style.overflow = 'unset';
+		}, 500);
+
 		setIsSliding(false);
 
 		const toUpdate = Math.round(right / determinedFrameSize);
 
 		setActive(toUpdate);
 		setRight(toUpdate * determinedFrameSize);
-		setXStart(dif);
+		setX(dif);
 		setDif(0);
 	};
 
@@ -206,11 +236,9 @@ export default function Carousel(props) {
 						onWheel={handleWheel}
 						className="touchgallery"
 						ref={galRef}
-						// right={`${right}`}
-						// width={props.children.length * width}
 						style={{
 							width: props.children.length * determinedFrameSize,
-							right,
+							right: `${right}px`,
 						}}
 					>
 						<ul>{mapKids()}</ul>
@@ -226,6 +254,11 @@ export default function Carousel(props) {
 					{'˃'}
 				</Arrow>
 				<Dots offset={dotsOffsetFromBottom}>{renderDots()}</Dots>
+				<ShowPosition
+					style={showPositionState ? { opacity: 1 } : { opacity: 0 }}
+				>
+					{active + 1}/{children.length}
+				</ShowPosition>
 			</Wrap>
 			{debug ? (
 				<div
@@ -238,8 +271,9 @@ export default function Carousel(props) {
 					}}
 				>
 					<h3 style={{ color: 'black' }}>state</h3>
+					<p>movingBy: {movingBy}</p>
 					<p>right:{right}</p>
-					<p>xStart: {xStart}</p>
+					<p>X: {X}</p>
 					<p>dif: {dif}</p>
 					<p>isSliding: {isSliding.toString()}</p>
 					<p>Active: {active}</p>
@@ -366,4 +400,19 @@ const Dots = styled.div.attrs(props => ({
 			transition: all 400ms;
 		}
 	}
+`;
+
+const ShowPosition = styled.div`
+	font-family: default;
+	transition: all 600ms;
+	background: black;
+	border-radius: 25%;
+	color: white;
+	margin: 0;
+	opacity: 0.5;
+	padding: 0.1rem;
+	display: flex;
+	position: absolute;
+	top: 12%;
+	right: 10%;
 `;

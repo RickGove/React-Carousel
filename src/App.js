@@ -7,14 +7,62 @@ import { hot } from 'react-hot-loader';
 export default hot(module)(function App() {
 	return (
 		<Carousel>
-			<h1>1</h1>
-			<h1>2</h1>
-			<h1>3</h1>
-			<h1>4</h1>
-			<img src="https://i.pinimg.com/originals/70/49/c4/7049c4667032d2d79a67d9cb4e128884.jpg" />
-			<img src="https://i.pinimg.com/originals/94/da/82/94da82a8a85a3c15506f3bf4d95298ea.jpg" />
-			<img src="https://i.pinimg.com/originals/97/b8/dd/97b8dd6020ff7cba2949d03c36844f66.png" />
-			<img src="https://s3951.pcdn.co/wp-content/uploads/2010/08/Davidson3-300x300.jpg" />
+			<img
+				alt="pic1"
+				src="https://pbs.twimg.com/profile_images/1098225250469326848/2KN00JjZ_400x400.png"
+			/>
+			<img
+				alt="pic1"
+				src="https://images.all-free-download.com/images/graphicthumb/hd_picture_of_the_beautiful_natural_scenery_03_166249.jpg"
+			/>
+			<img
+				alt="pic1"
+				src="http://www.lovethispic.com/uploaded_images/153035-Beautiful-Winter-Night.jpg"
+			/>
+			<div
+				style={{
+					background: '#44475a',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					height: '100%',
+				}}
+			>
+				<h1>Thanks</h1>
+			</div>
+			<div
+				style={{
+					background: '#6272a4',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					height: '100%',
+				}}
+			>
+				<h1>For</h1>
+			</div>
+			<div
+				style={{
+					background: '#44475a',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					height: '100%',
+				}}
+			>
+				<h1>Looking</h1>
+			</div>
+			<div
+				style={{
+					background: '#6272a4',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					height: '100%',
+				}}
+			>
+				<h1>!!!!</h1>
+			</div>
 		</Carousel>
 	);
 });
