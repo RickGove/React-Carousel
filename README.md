@@ -2,21 +2,29 @@
  A simple react carousel built as a test task for ScandiWeb
  
 # Navigation
- You can naviagte from slide to slide by 
- - clicking the arrows,
- - swiping on a mobile screen,
- - swiping with two fingers on a touchpad (like a MacBook pro)
+ You can navigate from slide to slide by 
+ - clicking the arrows
+ - swiping on a mobile screen
+ - swiping with two fingers on a touchpad (like a MacBook pro mouse)
  - fly to a certain slide by clicking its corresponding dot
 
+# Demo
+<a href="https://rickgove.github.io/#/carousel">demo page</a>
+
+*or*
+
+Download, clone or fork the repo
+
+In terminal run
+`npm install && npm start`
+
 # Use
- Download or clone the repo
- 
  Copy the `Carousel.js` file to your own project
  
- * Run `npm install` if you do not have `Styled-Components` as a dependancy yet
+ **Run `npm install` if you do not have `Styled-Components` as a dependancy yet**
  
  Import the carousel
- `import Carousel from './Carousel`
+ `import Carousel from './Carousel'`
  
  Render the carousel with children:
  
@@ -56,3 +64,5 @@ Example:
  ...
 </Carousel>
 ```
+
+# Thank you for taking time to have a look
