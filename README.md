@@ -41,6 +41,8 @@
 |flyTo| Enable clicking of dots to fly to given slide|boolean|true|
 |freeWheel| Enable snapping on touchpad two finger swipe |boolean|false|
 |openingSlide|Which slide to show on load|integer|0|
+|showPosition|Show which slide is currently shown|boolean|true|
+|showPositionFadeOut|Time in which position is faded out|int(ms)|4000|;
 
 Example:
 
