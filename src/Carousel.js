@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 const Wrap = styled.div.attrs(props => ({
 	width: `${props.width}px`,
+	height: `${props.height}px`,
 }))`
 	align-items: center;
 	display: flex;
@@ -140,7 +141,7 @@ export default function Carousel(props) {
 	const debug = props.debug || false;
 	const dotsOffsetFromBottom = props.dotsOffsetFromBottom || 5;
 	const flyTo = props.flyTo || true;
-	// const frameHeight = props.frameHeight || 270;
+	const frameHeight = props.frameHeight || 270;
 	const frameWidth = props.frameWidth || 350;
 	const freeWheel = props.freeWheel || false;
 	const openingSlide = props.openingSlide || 0;
@@ -293,7 +294,7 @@ export default function Carousel(props) {
 	};
 
 	const mapKids = () => {
-		return props.children.map((item, i) => {
+		return children.map((item, i) => {
 			return (
 				<li style={{ width: determinedFrameSize }} key={i}>
 					{item}
@@ -323,7 +324,7 @@ export default function Carousel(props) {
 
 	return (
 		<>
-			<Wrap width={frameWidth} ref={wrapRef}>
+			<Wrap height={frameHeight} width={frameWidth} ref={wrapRef}>
 				<Arrow
 					offset={arrowOffSet}
 					color={arrowColor}
@@ -345,7 +346,7 @@ export default function Carousel(props) {
 						className="touchgallery"
 						ref={galRef}
 						style={{
-							width: props.children.length * determinedFrameSize,
+							width: children.length * determinedFrameSize,
 							right: `${right}px`,
 						}}
 					>
