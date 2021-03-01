@@ -2,40 +2,150 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import styled from 'styled-components';
 
-export default function Carousel(props) {
-	//////////////////////////////
-	//			Props
-	//
-	let {
-		arrowColor,
-		arrowOffSet,
-		children,
-		debug,
-		dotsOffsetFromBottom,
-		flyTo,
-		frameHeight,
-		frameWidth,
-		freeWheel,
-		openingSlide,
-		showPosition,
-		showPositionFadeOut,
-	} = props;
+const Wrap = styled.div.attrs(props => ({
+	width: `${props.width}px`,
+}))`
+	align-items: center;
+	display: flex;
+	max-width: 100vw;
+	opacity: 0;
+	position: relative;
+	transition: all 400ms;
+	width: ${props => props.width};
+	max-width: 80vw;
+`;
 
-	////////////////////////////////
-	// Default props
-	//
-	if (!arrowColor) arrowColor = 'black';
-	if (!arrowOffSet) arrowOffSet = '2.2rem';
-	if (!debug) debug = false;
-	if (!dotsOffsetFromBottom) dotsOffsetFromBottom = 5;
-	if (!flyTo) flyTo = true;
-	if (!frameHeight) frameHeight = 270;
-	if (!frameWidth) frameWidth = 350;
-	if (!freeWheel) freeWheel = false;
-	if (!showPosition) showPosition = true;
-	if (!showPositionFadeOut) showPositionFadeOut = 4000;
-	//
-	///////////////////////////
+const Arrow = styled.div.attrs(props => ({
+	hide: `${props.hide}` || `unset`,
+	side: `${props.side}`,
+	offset: `${props.offset}` || '2.2rem',
+	color: `${props.color}` || 'black',
+}))`
+	${props => props.side}: ${props => props.offset};
+	align-items: center;
+	background: lightgrey;
+	color: ${props => props.color};
+	cursor: pointer;
+	display: ${props => props.hide};
+	display: flex;
+	font-size: 2rem;
+	height: 2rem;
+	justify-content: center;
+	opacity: 0.6;
+	outline: none;
+	position: relative;
+	transition: all 400ms;
+	user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	width: 2.2rem;
+	z-index: 1;
+`;
+
+const Border = styled.div`
+	height: 270px;
+	margin: auto;
+	overflow: hidden;
+	width: 100%;
+`;
+
+const Sliding = styled.div.attrs(props => ({
+	right: `${props.right}px`,
+	width: `${props.width}px`,
+	height: `${props.height}`,
+}))`
+	display: flex;
+	height: 270px;
+	overflow: hidden;
+	position: relative;
+	right: ${props => props.right};
+	transition: all 400ms;
+	width: ${props => props.width};
+	will-change: right;
+
+	ul {
+		height: 100%;
+		left: 0;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		transition: all 100ms ease-in-out;
+		-moz-transition: all 100ms ease-in-out;
+		-webkit-transition: all 100ms ease-in-out;
+	}
+
+	ul li {
+		height: 100%;
+		display: block;
+		float: left;
+		max-width: 100vw;
+		text-align: center;
+		width: ${props => props.width};
+	}
+
+	ul li img {
+		height: 350px;
+		height: auto;
+		max-height: 100%;
+	}
+`;
+
+const Dots = styled.div.attrs(props => ({
+	top: `${props.top}px`,
+	width: `${props.width / 2}px`,
+	offset: `${props.offset}%`,
+}))`
+	bottom: ${props => props.offset};
+	display: flex;
+	left: 50%;
+	opacity: 0.6;
+	position: absolute;
+	transform: translateX(-50%);
+
+	p {
+		cursor: pointer;
+		font-size: 0.5rem;
+		padding-left: 0.3rem;
+		&:hover {
+			opacity: 0.8;
+			transition: all 400ms;
+		}
+	}
+`;
+
+const ShowPosition = styled.div`
+	font-family: default;
+	transition: all 600ms;
+	background: black;
+	border-radius: 25%;
+	color: white;
+	margin: 0;
+	opacity: 0.5;
+	padding: 0.1rem;
+	display: flex;
+	position: absolute;
+	top: 12%;
+	right: 10%;
+`;
+
+export default function Carousel(props) {
+	// props
+	const arrowColor = props.ArrowColor || 'black';
+	const arrowOffSet = props.arrowOffSet || '2.2rem';
+	const children = props.children;
+	const debug = props.debug || false;
+	const dotsOffsetFromBottom = props.dotsOffsetFromBottom || 5;
+	const flyTo = props.flyTo || true;
+	// const frameHeight = props.frameHeight || 270;
+	const frameWidth = props.frameWidth || 350;
+	const freeWheel = props.freeWheel || false;
+	const openingSlide = props.openingSlide || 0;
+	const showPosition = props.showPosition || true;
+	const showPositionFadeOut = props.showPositionFadeOut || 4000;
 
 	// state
 	const [active, setActive] = useState(0);
@@ -85,10 +195,8 @@ export default function Carousel(props) {
 
 	useEffect(() => {
 		// setOpeningActive
-		if (!openingSlide) setActive(0);
-		else {
-			setRight(openingSlide * determinedFrameSize);
-		}
+		setActive(openingSlide);
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -286,133 +394,3 @@ export default function Carousel(props) {
 		</>
 	);
 }
-
-const Wrap = styled.div.attrs(props => ({
-	width: `${props.width}px`,
-}))`
-	align-items: center;
-	display: flex;
-	max-width: 100vw;
-	opacity: 0;
-	position: relative;
-	transition: all 400ms;
-	width: ${props => props.width};
-	max-width: 80vw;
-`;
-
-const Arrow = styled.div.attrs(props => ({
-	hide: `${props.hide}` || `unset`,
-	side: `${props.side}`,
-	offset: `${props.offset}` || '2.2rem',
-	color: `${props.color}` || 'black',
-}))`
-	${props => props.side}: ${props => props.offset};
-	align-items: center;
-	background: lightgrey;
-	color: ${props => props.color};
-	cursor: pointer;
-	display: ${props => props.hide};
-	display: flex;
-	font-size: 2rem;
-	height: 2rem;
-	justify-content: center;
-	opacity: 0.6;
-	outline: none;
-	position: relative;
-	transition: all 400ms;
-	user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	width: 2.2rem;
-	z-index: 1;
-`;
-
-const Border = styled.div`
-	height: 270px;
-	margin: auto;
-	overflow: hidden;
-	width: 100%;
-`;
-
-const Sliding = styled.div.attrs(props => ({
-	right: `${props.right}px`,
-	width: `${props.width}px`,
-	height: `${props.height}`,
-}))`
-	display: flex;
-	height: 270px;
-	overflow: hidden;
-	position: relative;
-	right: ${props => props.right};
-	transition: all 400ms;
-	width: ${props => props.width};
-	will-change: right;
-
-	ul {
-		height: 100%;
-		left: 0;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		position: absolute;
-		transition: all 100ms ease-in-out;
-		-moz-transition: all 100ms ease-in-out;
-		-webkit-transition: all 100ms ease-in-out;
-	}
-
-	ul li {
-		height: 100%;
-		display: block;
-		float: left;
-		max-width: 100vw;
-		text-align: center;
-		width: ${props => props.width};
-	}
-
-	ul li img {
-		height: 350px;
-		height: auto;
-		max-height: 100%;
-	}
-`;
-
-const Dots = styled.div.attrs(props => ({
-	top: `${props.top}px`,
-	width: `${props.width / 2}px`,
-	offset: `${props.offset}%`,
-}))`
-	bottom: ${props => props.offset};
-	display: flex;
-	left: 50%;
-	opacity: 0.6;
-	position: absolute;
-	transform: translateX(-50%);
-
-	p {
-		cursor: pointer;
-		font-size: 0.5rem;
-		padding-left: 0.3rem;
-		&:hover {
-			opacity: 0.8;
-			transition: all 400ms;
-		}
-	}
-`;
-
-const ShowPosition = styled.div`
-	font-family: default;
-	transition: all 600ms;
-	background: black;
-	border-radius: 25%;
-	color: white;
-	margin: 0;
-	opacity: 0.5;
-	padding: 0.1rem;
-	display: flex;
-	position: absolute;
-	top: 12%;
-	right: 10%;
-`;
