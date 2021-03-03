@@ -1,397 +1,263 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 import styled from 'styled-components';
 
-const Wrap = styled.div.attrs(props => ({
-	width: `${props.width}px`,
-	height: `${props.height}px`,
-}))`
-	align-items: center;
-	display: flex;
-	max-width: 100vw;
-	opacity: 0;
-	position: relative;
-	transition: all 400ms;
-	width: ${props => props.width};
-	max-width: 80vw;
+const CarouselDiv = styled.div`
+	-ms-overflow-style: none;
+	-webkit-overflow-scrolling: touch;
+	cursor: grab;
+	display: grid;
+	grid-template-columns: repeat(50, 20rem);
+	height: 20rem;
+	overflow-y: scroll;
+	scroll-behavior: smooth;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	scrollbar-width: none;
+
+	.grabbing {
+		cursor: grabbing;
+	}
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 `;
 
-const Arrow = styled.div.attrs(props => ({
-	hide: `${props.hide}` || `unset`,
-	side: `${props.side}`,
-	offset: `${props.offset}` || '2.2rem',
-	color: `${props.color}` || 'black',
-}))`
-	${props => props.side}: ${props => props.offset};
+const Slide = styled.div`
 	align-items: center;
-	background: lightgrey;
-	color: ${props => props.color};
-	cursor: pointer;
-	display: ${props => props.hide};
 	display: flex;
-	font-size: 2rem;
-	height: 2rem;
+	height: 20rem;
 	justify-content: center;
-	opacity: 0.6;
-	outline: none;
-	position: relative;
-	transition: all 400ms;
-	user-select: none;
+	scroll-snap-align: start;
+	width: 20rem;
+`;
+
+const Border = styled.div`
+	height: 20rem;
+	overflow: hidden;
+	position: absolute;
+	width: 20rem;
+
+	.arrows {
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		display: flex;
+		justify-content: space-between;
+		position: relative;
+		top: -13rem;
+		user-select: none;
+	}
+
+	.arrow {
+		align-items: center;
+		background: grey;
+		cursor: pointer;
+		display: flex;
+		justify-content: center;
+		opacity: 0.7;
+		padding: 0.5rem;
+		position: relative;
+		transition: all 400ms;
+
+		&:hover {
+			opacity: 1;
+			transition: all 400ms;
+		}
+	}
+
+	.prev {
+		left: -9rem;
+		top: -14rem;
+	}
+`;
+
+const Dots = styled.div`
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	width: 2.2rem;
-	z-index: 1;
-`;
-
-const Border = styled.div`
-	height: 270px;
-	margin: auto;
-	overflow: hidden;
-	width: 100%;
-`;
-
-const Sliding = styled.div.attrs(props => ({
-	right: `${props.right}px`,
-	width: `${props.width}px`,
-	height: `${props.height}`,
-}))`
+	align-items: center;
+	bottom: 2rem;
+	cursor: pointer;
 	display: flex;
-	height: 270px;
-	overflow: hidden;
+	font-size: 0.8rem;
+	justify-content: center;
+	opacity: 0.4;
+	outline: none;
 	position: relative;
-	right: ${props => props.right};
 	transition: all 400ms;
-	width: ${props => props.width};
-	will-change: right;
+	user-select: none;
+	width: 100%;
+	z-index: 100;
 
-	ul {
-		height: 100%;
-		left: 0;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		position: absolute;
-		transition: all 100ms ease-in-out;
-		-moz-transition: all 100ms ease-in-out;
-		-webkit-transition: all 100ms ease-in-out;
-	}
-
-	ul li {
-		height: 100%;
-		display: block;
-		float: left;
-		max-width: 100vw;
-		text-align: center;
-		width: ${props => props.width};
-	}
-
-	ul li img {
-		height: 350px;
-		height: auto;
-		max-height: 100%;
+	&:hover {
+		opacity: 1;
+		transition: all 400ms;
 	}
 `;
 
-const Dots = styled.div.attrs(props => ({
-	top: `${props.top}px`,
-	width: `${props.width / 2}px`,
-	offset: `${props.offset}%`,
-}))`
-	bottom: ${props => props.offset};
-	display: flex;
-	left: 50%;
-	opacity: 0.6;
-	position: absolute;
-	transform: translateX(-50%);
+const Carousel = props => {
+	// Props
+	const kids = props.children;
 
-	p {
-		cursor: pointer;
-		font-size: 0.5rem;
-		padding-left: 0.3rem;
-		&:hover {
-			opacity: 0.8;
-			transition: all 400ms;
-		}
-	}
-`;
+	// Refs
+	const carouselRef = useRef(null);
+	const slideRef = useRef(null);
 
-const ShowPosition = styled.div`
-	font-family: default;
-	transition: all 600ms;
-	background: black;
-	border-radius: 25%;
-	color: white;
-	margin: 0;
-	opacity: 0.5;
-	padding: 0.1rem;
-	display: flex;
-	position: absolute;
-	top: 12%;
-	right: 10%;
-`;
-
-export default function Carousel(props) {
-	// props
-	const arrowColor = props.ArrowColor || 'black';
-	const arrowOffSet = props.arrowOffSet || '2.2rem';
-	const children = props.children;
-	const debug = props.debug || false;
-	const dotsOffsetFromBottom = props.dotsOffsetFromBottom || 5;
-	const flyTo = props.flyTo || true;
-	const frameHeight = props.frameHeight || 270;
-	const frameWidth = props.frameWidth || 350;
-	const freeWheel = props.freeWheel || false;
-	const openingSlide = props.openingSlide || 0;
-	const showPosition = props.showPosition || true;
-	const showPositionFadeOut = props.showPositionFadeOut || 4000;
-
-	// state
+	// State
 	const [active, setActive] = useState(0);
-	const [determinedFrameSize, setDeterminedFrameSize] = useState(0);
-	const [dif, setDif] = useState(0);
-	const [isSliding, setIsSliding] = useState(false);
-	const [locked, setLocked] = useState(false);
-	const [outerBoundary, setOuterBoundary] = useState(0);
-	const [right, setRight] = useState(0);
-	const [showPositionState, setShowPosition] = useState(showPosition);
-	const [X, setX] = useState(0);
+	const [determinedFrameSize, setDeterminedFrameSize] = useState(null);
+	const [initClick, setInitClick] = useState(null);
+	const [isDown, setIsDown] = useState(false);
 
-	// refs
-	const borderRef = useRef();
-	const galRef = useRef();
-	const wrapRef = useRef();
-
+	// Determine Slide Size
 	useEffect(() => {
-		// initFrameSizeAndOuterBoundary
-		setFrameSizeAndOuterBoundary();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		if (!slideRef) return;
+		setDeterminedFrameSize(slideRef.current.clientWidth);
+	}, [determinedFrameSize]);
 
-	useEffect(() => {
-		// preventOverScroll
-		document.body.style.overscrollBehaviorX = 'none';
-	});
+	// setActiveBasedOnScroll
+	const determineActive = () => {
+		if (!carouselRef) return;
 
-	useEffect(() => {
-		// addResizeEvent
-		document.addEventListener('resize', setFrameSizeAndOuterBoundary);
-	});
-
-	useEffect(() => {
-		// fadeIn
-		wrapRef.current.style.opacity = 0;
-		window.setTimeout(() => {
-			wrapRef.current.style.opacity = 1;
-		}, 400);
-	}, []);
-
-	useEffect(() => {
-		// listenForRightChangeAndUpdateActive
-		setActive(Math.round(right / determinedFrameSize));
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [right]);
-
-	useEffect(() => {
-		// setOpeningActive
-		setActive(openingSlide);
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	useEffect(() => {
-		if (showPositionFadeOut === -1) return;
-
-		window.setTimeout(() => {
-			setShowPosition(false);
-		}, showPositionFadeOut);
-	});
-
-	const setFrameSizeAndOuterBoundary = () => {
-		if (!borderRef) return;
-
-		setDeterminedFrameSize(borderRef.current.clientWidth);
-
-		setOuterBoundary((children.length - 1) * borderRef.current.clientWidth);
+		setActive(Math.floor(carouselRef.current.scrollLeft / determinedFrameSize));
 	};
 
-	const handleTouchStart = e => {
-		document.body.style.overflow = 'hidden';
+	//////////////////////////////////
+	// set body style
+	//
+	const style = document.createElement('style');
+	style.innerHTML = `body::-webkit-scrollbar {display: none;}`;
+	document.head.appendChild(style);
 
-		setX(e.touches[0].clientX);
+	document.body.style.overscrollBehaviorX = 'none';
 
-		setMovingBy(0);
+	//
+	//
+	// End body style
+	//////////////////////////////////////
+
+	///////////////////////////////
+	// Click and Drag:
+	//
+	const handleMouseDown = e => {
+		e.preventDefault();
+
+		carouselRef.current.style.cursor = 'grabbing';
+
+		setIsDown(true);
+		setInitClick(e.clientX - determinedFrameSize + 14);
 	};
 
-	const [movingBy, setMovingBy] = useState(0);
+	document.onmouseup = e => {
+		if (!isDown) return;
 
-	const handleTouchMove = e => {
-		const current = e.touches[0].clientX;
+		carouselRef.current.style.cursor = 'grab';
 
-		let difVal = X - current;
-
-		if (right + difVal <= 0) setRight(0);
-		else if (right + difVal >= outerBoundary) setRight(outerBoundary);
-		else setRight(right + difVal);
-
-		setX(e.touches[0].clientX);
+		determineActive();
+		setIsDown(false);
 	};
 
-	const handleTouchEnd = () => {
-		window.setTimeout(() => {
-			document.body.style.overflow = 'unset';
-		}, 500);
+	const handleMouseMove = e => {
+		if (!isDown) return;
 
-		setIsSliding(false);
+		const drag = initClick - (e.clientX - determinedFrameSize + 14);
 
-		const toUpdate = Math.round(right / determinedFrameSize);
-
-		setActive(toUpdate);
-		setRight(toUpdate * determinedFrameSize);
-		setX(dif);
-		setDif(0);
+		carouselRef.current.scrollBy({
+			left: drag,
+			behavior: 'smooth',
+		});
 	};
 
-	const handleWheel = e => {
-		const move = e.deltaX;
+	document.onmousemove = e => handleMouseMove(e);
+	//
+	// End Click and Drag
+	///////////////////////////
 
-		if (freeWheel) {
-			const speed = 10;
-
-			if (move > 0 && right < outerBoundary) setRight(right + speed); // right
-
-			if (move < 0 && right > 0) setRight(right - speed); // left
-		} // not freewheel
-		else if (!locked) {
-			if (move > 10 && right < outerBoundary) {
-				// right
-				setRight(right + determinedFrameSize);
-				setLocked(true);
-				window.setTimeout(() => {
-					setLocked(false);
-				}, 1000);
-			} else if (move < -10 && right > 0) {
-				// left
-				setRight(right - determinedFrameSize);
-				setLocked(true);
-				window.setTimeout(() => {
-					setLocked(false);
-				}, 1000);
-			}
-		}
-	};
-
-	const prev = () => {
-		if (active === 0) return;
-		setRight(right - determinedFrameSize);
-	};
-
-	const next = () => {
-		if (active === children.length - 1) return;
-		setRight(right + determinedFrameSize);
-	};
-
-	const mapKids = () => {
-		return children.map((item, i) => {
+	const renderDots = () => {
+		return kids.map((item, i) => {
 			return (
-				<li style={{ width: determinedFrameSize }} key={i}>
-					{item}
-				</li>
+				<span
+					key={i}
+					role="img"
+					aria-label="dot"
+					onClick={() => {
+						carouselRef.current.scrollTo({
+							left: i * determinedFrameSize,
+							behavior: 'smooth',
+						});
+					}}
+				>
+					{active === i ? '🔘' : '⚪️'}
+				</span>
 			);
 		});
 	};
 
-	const renderDots = () => {
-		return children.map((item, i) => {
+	const prev = () => {
+		if (active === 0) return;
+
+		carouselRef.current.scrollBy({
+			left: -determinedFrameSize,
+			behavior: 'smooth',
+		});
+	};
+
+	const next = () => {
+		if (active === kids.length - 1) return;
+
+		carouselRef.current.scrollBy({
+			left: determinedFrameSize,
+			behavior: 'smooth',
+		});
+	};
+
+	const renderKids = () => {
+		return kids.map((item, i) => {
 			return (
-				<p
-					key={i}
-					onClick={
-						flyTo
-							? () => {
-									setRight(i * determinedFrameSize);
-							  }
-							: null
-					}
-				>
-					{i === active ? '🔘' : '⚪️'}
-				</p>
+				<Slide ref={slideRef} id={`Slide-${i}`} key={i}>
+					{item}
+				</Slide>
 			);
 		});
 	};
 
 	return (
 		<>
-			<Wrap height={frameHeight} width={frameWidth} ref={wrapRef}>
-				<Arrow
-					offset={arrowOffSet}
-					color={arrowColor}
-					side="left"
-					onClick={active === 0 ? null : prev}
-					style={active === 0 ? { opacity: 0 } : null}
+			<Border id="Border">
+				<CarouselDiv
+					onMouseDown={handleMouseDown}
+					onScroll={determineActive}
+					ref={carouselRef}
+					id="CarouselDiv"
 				>
-					{'˂'}
-				</Arrow>
-				<Border
-					ref={borderRef}
-					style={determinedFrameSize === 0 ? { opacity: 0 } : { opacity: 1 }}
-				>
-					<Sliding
-						onTouchStart={handleTouchStart}
-						onTouchMove={handleTouchMove}
-						onTouchEnd={handleTouchEnd}
-						onWheel={handleWheel}
-						className="touchgallery"
-						ref={galRef}
-						style={{
-							width: children.length * determinedFrameSize,
-							right: `${right}px`,
-						}}
-					>
-						<ul>{mapKids()}</ul>
-					</Sliding>
-				</Border>
-				<Arrow
-					offset={arrowOffSet}
-					side="right"
-					color={arrowColor}
-					onClick={active > children.length - 1 ? null : next}
-					style={active === children.length - 1 ? { opacity: 0 } : null}
-				>
-					{'˃'}
-				</Arrow>
-				<Dots offset={dotsOffsetFromBottom}>{renderDots()}</Dots>
-				<ShowPosition
-					style={showPositionState ? { opacity: 1 } : { opacity: 0 }}
-				>
-					{active + 1}/{children.length}
-				</ShowPosition>
-			</Wrap>
-			{debug ? (
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-						background: 'grey',
-						marginTop: '1rem',
-					}}
-				>
-					<h3 style={{ color: 'black' }}>state</h3>
-					<p>movingBy: {movingBy}</p>
-					<p>right:{right}</p>
-					<p>X: {X}</p>
-					<p>dif: {dif}</p>
-					<p>isSliding: {isSliding.toString()}</p>
-					<p>Active: {active}</p>
-					<p>determinedFrameSize: {determinedFrameSize}</p>
-					<p>outerBoundary: {outerBoundary}</p>
-					<p>children.length: {children.length}</p>
-					<p>locked? {locked.toString()}</p>
+					{renderKids()}
+				</CarouselDiv>
+				<Dots>{renderDots()}</Dots>
+				<div className="arrows">
+					{active === 0 ? (
+						<span></span>
+					) : (
+						<div onClick={prev} className="arrow">
+							{'<'}
+						</div>
+					)}
+					{active === kids.length - 1 ? (
+						<span></span>
+					) : (
+						<div onClick={next} className="arrow">
+							{'>'}
+						</div>
+					)}
 				</div>
-			) : null}
+			</Border>
 		</>
 	);
-}
+};
+
+export default Carousel;
