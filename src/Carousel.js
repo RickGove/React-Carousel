@@ -2,6 +2,14 @@ import React, { useRef, useState, useEffect } from 'react';
 
 import styled from 'styled-components';
 
+const Wrap = styled.div`
+	height: 100vh;
+	width: 100vw;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 const CarouselDiv = styled.div`
 	-ms-overflow-style: none;
 	-webkit-overflow-scrolling: touch;
@@ -228,7 +236,7 @@ const Carousel = props => {
 	};
 
 	return (
-		<>
+		<Wrap>
 			<Border id="Border">
 				<CarouselDiv
 					onMouseDown={handleMouseDown}
@@ -256,7 +264,7 @@ const Carousel = props => {
 					)}
 				</div>
 			</Border>
-		</>
+		</Wrap>
 	);
 };
 
