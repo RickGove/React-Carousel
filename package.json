@@ -1,7 +1,7 @@
 {
-	"name": "react-carousel-by-rick-gove",
+	"name": "todo-enter-name",
 	"version": "1.0.0",
-	"description": "A react carousel",
+	"description": "TODO Enter Desctiprion",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
